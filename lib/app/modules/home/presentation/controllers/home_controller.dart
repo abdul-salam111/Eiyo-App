@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+
 import 'package:neutri_lens/app/modules/home/domain/usecases/get_all_products_usecase.dart';
 import 'package:neutri_lens/app/modules/home/domain/usecases/search_products_usecase.dart';
 import '../../data/models/get_all_products_model.dart';
@@ -116,39 +117,45 @@ class HomeController extends GetxController {
       }
     });
   }
- /// Executes search with the given query
+
+  /// Executes search with the given query
   /// Resets pagination and clears previous results
   void performSearch(String query) {
-  final trimmedQuery = query.trim();
-  if (trimmedQuery == searchQuery.value) return;
+    errorMessage.value = '';
+    final trimmedQuery = query.trim();
+    if (trimmedQuery == searchQuery.value) return;
 
-  final operationId = _generateOperationId();
-  _currentOperationId.value = operationId;
+    final operationId = _generateOperationId();
+    _currentOperationId.value = operationId;
 
-  searchQuery.value = trimmedQuery;
-  currentPage.value = 1;
-  products.clear();
-  hasMoreData.value = true;
+    searchQuery.value = trimmedQuery;
+    currentPage.value = 1;
+    products.clear();
+    hasMoreData.value = true;
 
-  if (trimmedQuery.isEmpty) {
-    // User cleared search → reset UI
-    isLoading.value = false;
-    return;
+    if (trimmedQuery.isEmpty) {
+      // ✅ User cleared search → just show empty state, no API call
+      isLoading.value = false;
+      return;
+    }
+
+    isLoading.value = true;
+    _searchProducts(operationId);
   }
 
-  isLoading.value = true;
-  _searchProducts(operationId);
-}
-
-  /// Clears search and returns to showing all products
+  /// Clears search and returns to empty state
   void clearSearch() {
-  searchController.clear();
-  searchQuery.value = '';
-  currentPage.value = 1;
-  products.clear();
-  hasMoreData.value = true;
-  _currentOperationId.value = _generateOperationId();
-}
+    searchController.clear();
+    searchQuery.value = '';
+    currentPage.value = 1;
+    products.clear();
+    errorMessage.value = '';
+    hasMoreData.value = true;
+    _currentOperationId.value = _generateOperationId();
+
+    // ✅ Just clear the products and show empty state
+    // No API call to get all products
+  }
 
   // ==========================================================================
   // PRODUCTS LOADING (Initial & Refresh)
@@ -193,8 +200,6 @@ class HomeController extends GetxController {
       },
     );
   }
-
-
 
   // ==========================================================================
   // PAGINATION (Load More)

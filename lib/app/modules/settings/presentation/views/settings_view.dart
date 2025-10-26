@@ -55,6 +55,9 @@ class SettingsView extends GetView<SettingsController> {
               Obx(
                 () => Column(
                   children: List.generate(controller.goals.length, (index) {
+                    final goal = controller.goals[index];
+                    final goalId = goal.id!;
+                    
                     return Obx(
                       () => CheckboxListTile(
                         contentPadding: EdgeInsets.zero,
@@ -64,18 +67,17 @@ class SettingsView extends GetView<SettingsController> {
                         side: BorderSide(color: AppColors.appPrimaryColor),
                         activeColor: AppColors.appPrimaryColor,
                         title: Text(
-                          controller.goals[index].name ?? "",
+                          goal.name ?? "",
                           style: context.bodyMedium!.copyWith(),
                         ),
-                        value: controller.selectedGoalsIndex.contains(index)
-                            ? true
-                            : false,
+                        // ✅ FIXED: Check by ID instead of index
+                        value: controller.selectedGoalsIds.contains(goalId),
                         onChanged: controller.isEdit.value
                             ? (value) {
                                 if (value!) {
-                                  controller.selectedGoalsIndex.add(index);
+                                  controller.selectedGoalsIds.add(goalId);
                                 } else {
-                                  controller.selectedGoalsIndex.remove(index);
+                                  controller.selectedGoalsIds.remove(goalId);
                                 }
                               }
                             : (val) {},
@@ -95,9 +97,8 @@ class SettingsView extends GetView<SettingsController> {
                   spacing: 8,
                   runSpacing: 8,
                   children: controller.allergensToAvoid.map((item) {
-                    final isSelected = controller.selectedAllergens.contains(
-                      item.id,
-                    );
+                    final itemId = item.id!;
+                    final isSelected = controller.selectedAllergenIds.contains(itemId);
 
                     return ChoiceChip(
                       label: Text(
@@ -113,15 +114,13 @@ class SettingsView extends GetView<SettingsController> {
                       selectedColor: AppColors.appPrimaryColor,
                       disabledColor: isSelected
                           ? AppColors.appPrimaryColor
-                          : Colors
-                                .white, // ✅ consistent color even when disabled
+                          : Colors.white,
                       onSelected: (_) {
-                        if (!controller.isEdit.value)
-                          return; // ✅ ignore taps when not editing
+                        if (!controller.isEdit.value) return;
                         if (isSelected) {
-                          controller.selectedAllergens.remove(item.id);
+                          controller.selectedAllergenIds.remove(itemId);
                         } else {
-                          controller.selectedAllergens.add(item.id!);
+                          controller.selectedAllergenIds.add(itemId);
                         }
                       },
                     );

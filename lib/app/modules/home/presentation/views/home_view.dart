@@ -140,7 +140,7 @@ class HomeView extends GetView<HomeController> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Text(
-                            "Products not available, please check your internet connection!",
+                            controller.errorMessage.value,
                             style: context.bodyMedium!.copyWith(),
                             textAlign: textAlignCenter,
                           ),
@@ -209,34 +209,27 @@ class HomeView extends GetView<HomeController> {
                         ),
                       );
                     }
-                
+
                     final product = controller.products[index];
-                
+
                     return InkWell(
                       onTap: () async {
                         dismissKeyboard(context);
                         final productCode = product.code;
                         if (productCode == null || productCode.isEmpty) {
-                          AppSnackBar.error(
-                            context,
-                            "Product code not found",
-                          );
+                          AppSnackBar.error(context, "Product code not found");
                           return;
                         }
-                
-                        showLoadingPopup(
-                          message: "Loading product details...",
-                        );
-                
+
+                        showLoadingPopup(message: "Loading product details...");
+
                         try {
                           final resultController = Get.put(
                             ResultController(Get.find()),
                           );
-                
+
                           // Fetch product details
-                          await resultController.getProductDetails(
-                            productCode,
-                          );
+                          await resultController.getProductDetails(productCode);
                           resultController.getGoalsAndPreferences(
                             GoalsAndPreferenceRequestModel(
                               nutriments: product.nutriments!
@@ -252,13 +245,13 @@ class HomeView extends GetView<HomeController> {
                           );
                           // Close loading dialog
                           Get.back();
-                
+
                           // Navigate to result page
                           await Get.toNamed(Routes.RESULT);
                         } catch (e) {
                           // Close loading dialog
                           Get.back();
-                
+
                           AppSnackBar.error(
                             context,
                             "Failed to load product details",
@@ -277,9 +270,7 @@ class HomeView extends GetView<HomeController> {
                             Container(
                               decoration: BoxDecoration(
                                 border: Border.all(
-                                  color: AppColors.darkGreyColor.withAlpha(
-                                    80,
-                                  ),
+                                  color: AppColors.darkGreyColor.withAlpha(80),
                                 ),
                                 borderRadius: BorderRadius.circular(10),
                               ),
@@ -288,12 +279,10 @@ class HomeView extends GetView<HomeController> {
                                 child: product.imageFrontSmallUrl != null
                                     ? CachedNetworkImage(
                                         imageUrl: product.imageFrontSmallUrl!,
-                                        height: Platform.isAndroid
-                                            ? 100
-                                            : 100,
+                                        height: Platform.isAndroid ? 100 : 100,
                                         width: Platform.isAndroid ? 100 : 100,
                                         fit: BoxFit.cover,
-                
+
                                         errorWidget: (context, url, error) =>
                                             Image.asset(
                                               AppImages.appLogo,
@@ -336,9 +325,9 @@ class HomeView extends GetView<HomeController> {
                                       ),
                                     ],
                                   ),
-                
+
                                   heightBox(4),
-                
+
                                   /// Brand (wraps automatically)
                                   if (product.brands != null)
                                     RichText(
@@ -346,10 +335,9 @@ class HomeView extends GetView<HomeController> {
                                         children: [
                                           TextSpan(
                                             text: product.brands ?? "N/A",
-                                            style: context.bodySmall!
-                                                .copyWith(
-                                                  color: Colors.black,
-                                                ),
+                                            style: context.bodySmall!.copyWith(
+                                              color: Colors.black,
+                                            ),
                                           ),
                                         ],
                                       ),
@@ -362,17 +350,18 @@ class HomeView extends GetView<HomeController> {
                                         children: [
                                           TextSpan(
                                             text: product.categories ?? "N/A",
-                                            style: context.bodySmall!
-                                                .copyWith(color: Colors.grey),
+                                            style: context.bodySmall!.copyWith(
+                                              color: Colors.grey,
+                                            ),
                                           ),
                                         ],
                                       ),
                                       overflow: TextOverflow.visible,
                                       maxLines: 1,
                                     ),
-                
+
                                   heightBox(8),
-                
+
                                   /// NutriScore + FoodIQ
                                   buildGradeBadge(
                                     context,

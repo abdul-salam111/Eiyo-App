@@ -17,9 +17,9 @@ class SettingsController extends GetxController {
   });
 
   final goals = <DietPreference>[].obs;
-  final selectedGoalsIndex = <int>[].obs;
+  final selectedGoalsIds = <int>[].obs; // ✅ Changed from selectedGoalsIndex
   final allergensToAvoid = <DietPreference>[].obs;
-  final selectedAllergens = <int>[].obs;
+  final selectedAllergenIds = <int>[].obs; // ✅ Changed from selectedAllergens
   final isLoading = false.obs;
 
   getGoalsAndDietList() async {
@@ -35,18 +35,37 @@ class SettingsController extends GetxController {
     super.onInit();
     getGoalsAndDietList();
     final userDetails = SessionController().getUserDetails;
-    selectedGoalsIndex.value = List<int>.from(userDetails.goals ?? []);
-    selectedAllergens.value = List<int>.from(userDetails.dietPreferences ?? []);
+
+    // ✅ These should already be IDs from the backend, not indexes
+    selectedGoalsIds.value = List<int>.from(userDetails.goals ?? []);
+    selectedAllergenIds.value = List<int>.from(
+      userDetails.dietPreferences ?? [],
+    );
+
+    // Debug: Print what we're loading
+    print("📥 Loading user goals IDs: ${selectedGoalsIds}");
+    print("📥 Loading user preference IDs: ${selectedAllergenIds}");
   }
 
   Future updateProfile() async {
     isLoading.value = true;
-    List<profile.DietPreference>? updategoals = selectedGoalsIndex
-        .map((e) => profile.DietPreference(id: e))
+
+    // ✅ Use the actual IDs (not indexes)
+    List<profile.DietPreference>? updategoals = selectedGoalsIds
+        .where((id) => id != 0) // ✅ Filter out invalid IDs
+        .map((id) => profile.DietPreference(id: id))
         .toList();
-    List<profile.DietPreference>? updatediets = selectedAllergens
-        .map((e) => profile.DietPreference(id: e))
+
+    List<profile.DietPreference>? updatediets = selectedAllergenIds
+        .where((id) => id != 0) // ✅ Filter out invalid IDs
+        .map((id) => profile.DietPreference(id: id))
         .toList();
+
+    // Debug: Print what we're sending
+    print("📤 Sending goals IDs: ${updategoals.map((g) => g.id).toList()}");
+    print(
+      "📤 Sending preference IDs: ${updatediets.map((d) => d.id).toList()}",
+    );
 
     final response = await updateUserUsecase.call(
       profile.ProfileModel(
@@ -70,5 +89,22 @@ class SettingsController extends GetxController {
         update();
       },
     );
+  }
+
+  // ✅ Helper methods to add/remove IDs (not indexes)
+  void toggleGoal(int goalId) {
+    if (selectedGoalsIds.contains(goalId)) {
+      selectedGoalsIds.remove(goalId);
+    } else {
+      selectedGoalsIds.add(goalId);
+    }
+  }
+
+  void toggleAllergen(int allergenId) {
+    if (selectedAllergenIds.contains(allergenId)) {
+      selectedAllergenIds.remove(allergenId);
+    } else {
+      selectedAllergenIds.add(allergenId);
+    }
   }
 }
