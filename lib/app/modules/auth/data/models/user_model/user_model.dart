@@ -1,4 +1,6 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
+
+import '../../../domain/entities/user_entity.dart';
 // import 'package:neutri_lens/app/modules/auth/domain/entities/user_entity.dart';
 part 'user_model.freezed.dart';
 part 'user_model.g.dart';
@@ -19,14 +21,14 @@ abstract class UserModel with _$UserModel {
       _$UserModelFromJson(json);
 }
 
-// extension UserModelX on UserModel {
-//   UserEntity toEntity() => UserEntity(
-//     username: username ?? "",
-//     password: password ?? "",
-//     fullname: fullName ?? "",
-//     ageFrom: ageFrom ?? 18,
-//     toAge: ageTo ?? 24,
-//     goals: goals ?? [],
-//     dietPreferences: dietPreferences ?? [],
-//   );
-// }
+extension UserModelX on UserModel {
+  UserEntity toEntity() => UserEntity(
+    username: username ?? "",
+    password: password ?? "",
+    fullname: fullName ?? "",
+    ageFrom: ageFrom ?? 18,
+    toAge: ageTo ?? 24,
+    goals: goals ?? [],
+    dietPreferences: dietPreferences ?? [],
+  );
+}
