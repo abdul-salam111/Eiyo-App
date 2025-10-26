@@ -14,6 +14,6 @@ class NavbarBinding extends Bindings {
     SettingsBinding().dependencies();
     TrendsBinding().dependencies();
     ProfileBinding().dependencies();
-    ResultBinding().dependencies(); 
+    ResultBinding().dependencies();
   }
 }

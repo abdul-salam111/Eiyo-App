@@ -224,10 +224,7 @@ class HomeView extends GetView<HomeController> {
                         showLoadingPopup(message: "Loading product details...");
 
                         try {
-                          final resultController = Get.put(
-                            ResultController(Get.find()),
-                          );
-
+                          final resultController = Get.find<ResultController>();
                           // Fetch product details
                           await resultController.getProductDetails(productCode);
                           resultController.getGoalsAndPreferences(

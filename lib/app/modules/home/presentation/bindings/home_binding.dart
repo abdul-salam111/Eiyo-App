@@ -29,5 +29,6 @@ class HomeBinding extends Bindings {
         searchProductsUsecase: Get.find<SearchProductsUsecase>(),
       ),
     );
+        
   }
 }
