@@ -17,7 +17,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return GetMaterialApp(
       debugShowCheckedModeBanner: false,
-      title: "Neutri Lens Clean Architecture",
+      title: "Eiyo App Clean Architecture",
       initialRoute: Routes.SPLASH,
       getPages: AppPages.routes,
       theme: AppThemes.lightTheme,
